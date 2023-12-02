@@ -1,6 +1,12 @@
+using Backend.Dao;
 using Backend.Service;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add DbContext
+builder.Services.AddDbContext<ApplicationDao>(options =>
+    options.UseSqlServer("name=ConnectionStrings:DefaultConnection"));
 
 // Add services to the container.
 builder.Services.AddTransient<ProductService, ProductServiceImpl>();
