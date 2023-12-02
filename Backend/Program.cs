@@ -6,8 +6,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDao>(options =>
-    options.UseSqlServer("name=ConnectionStrings:DefaultConnection"));
-
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
 // Add services to the container.
 builder.Services.AddTransient<ProductService, ProductServiceImpl>();
 

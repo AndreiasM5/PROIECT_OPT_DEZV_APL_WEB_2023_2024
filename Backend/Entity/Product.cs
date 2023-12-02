@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend.Entity;
@@ -6,6 +7,8 @@ namespace Backend.Entity;
 public class Product
 {
     [Column("product_id")]
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int ProductId { get; set; }
 
     [Column("name")]

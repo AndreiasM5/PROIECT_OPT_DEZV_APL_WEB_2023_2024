@@ -15,7 +15,7 @@ public class ProductServiceImpl : ProductService
 
     public ProductDto GetProduct(int productId)
     {   
-        saveProducts();
+        //saveProducts();
         Product product = _applicationDao.Products
         .FirstOrDefault(p => p.ProductId == productId);
 
@@ -37,19 +37,16 @@ public class ProductServiceImpl : ProductService
     {
         Product product1 = new Product
         {
-            ProductId = 1,
             Name = "Water",
             Price = 2
         };
         Product product2 = new Product
         {
-            ProductId = 2,
             Name = "Pepsi",
             Price = 4
         };
         Product product3 = new Product 
         {
-            ProductId = 3,
             Name = "Jack Daniels",
             Price = 10
         };
@@ -57,5 +54,6 @@ public class ProductServiceImpl : ProductService
         _applicationDao.Add(product1);
         _applicationDao.Add(product2);
         _applicationDao.Add(product3);
+        _applicationDao.SaveChanges();
     }
 }
