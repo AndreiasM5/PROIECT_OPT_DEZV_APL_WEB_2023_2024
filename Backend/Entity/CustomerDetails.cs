@@ -3,17 +3,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend.Entity;
 
-[Table("address")]
-public class Address
+[Table("customer_details")]
+public class CustomerDetails
 {
-    [Column("address_id")]
+    [Column("customer_details_id")]
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int AddressId { get; set; }
+    public int CustomerDetailsId { get; set; }
     
     [Column("street")]
     public string Street { get; set; }
     
     [Column("city")]
     public string City { get; set; }
+
+    [Column("phone")]
+    public string Phone { get; set; }
 }
