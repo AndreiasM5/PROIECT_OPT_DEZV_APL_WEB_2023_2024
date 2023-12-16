@@ -1,9 +1,11 @@
 using Backend.Entity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Dao;
 
-public class ApplicationDao : DbContext
+public class ApplicationDao : IdentityDbContext<IdentityUser>
 {
     public ApplicationDao(DbContextOptions<ApplicationDao> options)
         : base(options)
@@ -12,6 +14,9 @@ public class ApplicationDao : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {   
+        //Identity config
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<Order>()
         .HasMany(o => o.Products)
         .WithMany();
