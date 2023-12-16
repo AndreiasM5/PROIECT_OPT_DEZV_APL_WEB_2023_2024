@@ -1,6 +1,7 @@
 using Backend.Dao;
 using Backend.Dto;
 using Backend.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Service;
 
@@ -15,7 +16,6 @@ public class ProductServiceImpl : ProductService
 
     public ProductDto GetProduct(int productId)
     {   
-        //saveProducts();
         Product product = _applicationDao.Products
         .FirstOrDefault(p => p.ProductId == productId);
 
@@ -32,28 +32,65 @@ public class ProductServiceImpl : ProductService
 
         return productDto;
     }
-
-    private void saveProducts() 
-    {
-        Product product1 = new Product
+    public ProductDto AddProduct(ProductDto productDto)
+    {   
+        Product product = new Product
         {
-            Name = "Water",
-            Price = 2
-        };
-        Product product2 = new Product
-        {
-            Name = "Pepsi",
-            Price = 4
-        };
-        Product product3 = new Product 
-        {
-            Name = "Jack Daniels",
-            Price = 10
+            Name = productDto.Name,
+            Price = productDto.Price
         };
 
-        _applicationDao.Add(product1);
-        _applicationDao.Add(product2);
-        _applicationDao.Add(product3);
+        _applicationDao.Products.Add(product);
         _applicationDao.SaveChanges();
+
+        productDto.ProductId = product.ProductId;
+        return productDto;
     }
+
+    public void DeleteProduct(int productId) 
+    {
+
+        Product product = _applicationDao.Products
+        .FirstOrDefault(p => p.ProductId == productId);
+
+        if (product == null) {
+            throw new Exception();
+        }
+        
+        _applicationDao.Products.Remove(product);
+        _applicationDao.SaveChanges();
+        
+    }
+
+    public ProductDto UpdateProduct(int productId, ProductDto updatedProductDto)
+    {
+    // Retrieve the existing product
+    Product existingProduct = _applicationDao.Products
+        .FirstOrDefault(p => p.ProductId == productId);
+
+    // Check if the product exists
+    if (existingProduct == null)
+    {
+        throw new Exception("Product not found");
+    }
+
+    // Update the existing product with the new data
+    existingProduct.Name = updatedProductDto.Name;
+    existingProduct.Price = updatedProductDto.Price;
+
+    // Save changes to the database
+    _applicationDao.SaveChanges();
+
+    // Return the updated product data
+    updatedProductDto = new ProductDto
+    {
+        ProductId = existingProduct.ProductId,
+        Name = existingProduct.Name,
+        Price = existingProduct.Price
+    };
+
+    return updatedProductDto;
+    }
+
+
 }
