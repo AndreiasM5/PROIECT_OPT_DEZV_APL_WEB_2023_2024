@@ -14,12 +14,12 @@ public class Order
     public decimal TotalAmount { get; set; }
 
     // Foreign key property
-    [ForeignKey("Customer")]
-    public int CustomerId { get; set; }
+    [ForeignKey("User")]
+    public string UserId { get; set; }
 
-    // Navigation property back to the parent Customer
-    // Customer - Order one-to-many relationship
-    public Customer Customer { get; set; }
+    // Navigation property back to the parent User
+    // User - Order one-to-many relationship
+    public User User { get; set; }
 
     // Many to many relationship with Product
     public List<Product> Products { get; set;}
