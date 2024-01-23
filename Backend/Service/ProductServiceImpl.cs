@@ -20,7 +20,7 @@ public class ProductServiceImpl : ProductService
         .FirstOrDefault(p => p.ProductId == productId);
 
         if (product == null) {
-            throw new Exception();
+            throw new KeyNotFoundException("product with specified id doesn't exist");
         }
         
         ProductDto productDto = new ProductDto
