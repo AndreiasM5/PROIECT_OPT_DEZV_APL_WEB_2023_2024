@@ -19,6 +19,19 @@ builder.Services.AddTransient<ErrorHandlerMiddleware>();
 builder.Services.AddTransient<ProductService, ProductServiceImpl>();
 builder.Services.AddTransient<OrderService>();
 
+// CORS config
+var allowedOrigin = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("myAppCors", policy =>
+    {
+        policy.WithOrigins(allowedOrigin)
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+    });
+});
+
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -61,6 +74,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("myAppCors");
 app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
