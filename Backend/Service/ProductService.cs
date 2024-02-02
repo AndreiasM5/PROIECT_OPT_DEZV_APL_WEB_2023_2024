@@ -1,12 +1,13 @@
 using Backend.Dto;
+using Backend.Entity;
 
 namespace Backend.Service;
 
 public interface ProductService
-{
-    ProductDto AddProduct(ProductDto productDto);
-    ProductDto GetProduct(int productId);
+{   List<Product> GetAllProducts();
+    Product GetProduct(int productId);
+    Product AddProduct(Product product);
     void DeleteProduct(int productId);
-    ProductDto UpdateProduct(int productId, ProductDto updatedProductDto);
+    Product UpdateProduct(int productId, Product updatedProduct);
     
 }

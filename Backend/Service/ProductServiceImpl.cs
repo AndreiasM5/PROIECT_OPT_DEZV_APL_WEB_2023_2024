@@ -14,7 +14,14 @@ public class ProductServiceImpl : ProductService
         _applicationDao = applicationDao;
     }
 
-    public ProductDto GetProduct(int productId)
+    public List<Product> GetAllProducts()
+    {
+        List<Product> products = _applicationDao.Products.ToList();
+
+        return products;
+    }
+
+    public Product GetProduct(int productId)
     {   
         Product product = _applicationDao.Products
         .FirstOrDefault(p => p.ProductId == productId);
@@ -22,29 +29,17 @@ public class ProductServiceImpl : ProductService
         if (product == null) {
             throw new KeyNotFoundException("product with specified id doesn't exist");
         }
-        
-        ProductDto productDto = new ProductDto
-        {
-            ProductId = product.ProductId,
-            Name = product.Name,
-            Price = product.Price
-        };
 
-        return productDto;
+        return product;
     }
-    public ProductDto AddProduct(ProductDto productDto)
+    
+    public Product AddProduct(Product product)
     {   
-        Product product = new Product
-        {
-            Name = productDto.Name,
-            Price = productDto.Price
-        };
-
         _applicationDao.Products.Add(product);
         _applicationDao.SaveChanges();
 
-        productDto.ProductId = product.ProductId;
-        return productDto;
+        product.ProductId = product.ProductId;
+        return product;
     }
 
     public void DeleteProduct(int productId) 
@@ -62,7 +57,7 @@ public class ProductServiceImpl : ProductService
         
     }
 
-    public ProductDto UpdateProduct(int productId, ProductDto updatedProductDto)
+    public Product UpdateProduct(int productId, Product updatedProduct)
     {
     // Retrieve the existing product
     Product existingProduct = _applicationDao.Products
@@ -75,22 +70,13 @@ public class ProductServiceImpl : ProductService
     }
 
     // Update the existing product with the new data
-    existingProduct.Name = updatedProductDto.Name;
-    existingProduct.Price = updatedProductDto.Price;
+    existingProduct.Name = updatedProduct.Name;
+    existingProduct.Price = updatedProduct.Price;
 
     // Save changes to the database
     _applicationDao.SaveChanges();
 
-    // Return the updated product data
-    updatedProductDto = new ProductDto
-    {
-        ProductId = existingProduct.ProductId,
-        Name = existingProduct.Name,
-        Price = existingProduct.Price
-    };
-
-    return updatedProductDto;
+    return existingProduct;
     }
-
 
 }
