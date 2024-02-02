@@ -42,5 +42,3 @@
 ## Authentication Process
 
 The authentication process in this project is inspired by the following article: [JWT Authentication and Authorization in .NET 6.0 with Identity Framework](https://www.c-sharpcorner.com/article/jwt-authentication-and-authorization-in-net-6-0-with-identity-framework/).
-
-Feel free to add more sections or details specific to your project as needed. Additionally, consider including information about environment variables, configuration files, or any other setup steps that might be relevant to users running or contributing to your project.
