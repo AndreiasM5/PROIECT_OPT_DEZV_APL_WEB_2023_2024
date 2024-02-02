@@ -49,6 +49,8 @@ public class AuthenticateController : ControllerBase
 
             JwtSecurityToken token = GetToken(authClaims);
 
+            HttpContext.Response.Headers.Add("Jwt", new JwtSecurityTokenHandler().WriteToken(token));
+            HttpContext.Response.Headers.Add("Access-Control-Expose-Headers", "Jwt");
             return Ok(new 
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token),
