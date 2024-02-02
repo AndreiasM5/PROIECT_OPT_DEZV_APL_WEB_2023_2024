@@ -26,7 +26,6 @@ public class OrderController : ControllerBase
     [Route("all")]
     public async Task<IActionResult> GetUserOrders()
     {
-    // Retrieve user informatio
     var userEmail = User.FindFirstValue(ClaimTypes.Name);
     User user = await _userManager.FindByNameAsync(userEmail);  
 
@@ -41,7 +40,8 @@ public class OrderController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateOrderAsync([FromBody] OrderDto orderDto)
     {   
-        var user = await _userManager.GetUserAsync(HttpContext.User);
+        var userEmail = User.FindFirstValue(ClaimTypes.Name);
+        User user = await _userManager.FindByNameAsync(userEmail);  
         if (user == null)
         {
             return BadRequest("User not found");
@@ -55,7 +55,8 @@ public class OrderController : ControllerBase
     [Route("{orderId}")]
     public async Task<IActionResult> DeleteOrderAsync(int orderId)
     {
-        var user = await _userManager.GetUserAsync(HttpContext.User);
+        var userEmail = User.FindFirstValue(ClaimTypes.Name);
+        User user = await _userManager.FindByNameAsync(userEmail);  
 
         if (user == null)
         {
@@ -70,7 +71,8 @@ public class OrderController : ControllerBase
     [Route("{orderId}")]
     public async Task<IActionResult> UpdateOrderAsync(int orderId, [FromBody] OrderDto updatedOrderDto)
     {
-        var user = await _userManager.GetUserAsync(HttpContext.User);
+        var userEmail = User.FindFirstValue(ClaimTypes.Name);
+        User user = await _userManager.FindByNameAsync(userEmail);  
 
         if (user == null)
         {
