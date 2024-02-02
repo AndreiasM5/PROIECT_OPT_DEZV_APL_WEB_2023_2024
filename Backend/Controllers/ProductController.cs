@@ -1,12 +1,11 @@
-
-using Backend.Dto;
+using Backend.Entity;
 using Backend.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers;
 
-// [Authorize]
+[Authorize]
 [ApiController]
 [Route("api/product")]
 public class ProductController : ControllerBase 
@@ -18,18 +17,25 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet]
+    [Route("all")]
+    public IActionResult GetAllProducts() {
+        List<Product> products = _productService.GetAllProducts();
+        return Ok(products);
+    }
+
+    [HttpGet]
     [Route("{productId}")]
     public IActionResult GetProduct(int productId) {
-        ProductDto productDto = _productService.GetProduct(productId);
-        return Ok(productDto);
+        Product product = _productService.GetProduct(productId);
+        return Ok(product);
     }
 
     [HttpPost]  
-    public IActionResult AddCustomer([FromBody] ProductDto productDto)
+    public IActionResult AddCustomer([FromBody] Product Product)
     {
-        productDto = _productService.AddProduct(productDto);
+        Product = _productService.AddProduct(Product);
         
-        return CreatedAtAction(nameof(GetProduct), new { productDto.ProductId }, productDto );
+        return CreatedAtAction(nameof(GetProduct), new { Product.ProductId }, Product );
     }
 
     [HttpDelete]
@@ -41,9 +47,9 @@ public class ProductController : ControllerBase
 
     [HttpPut]
     [Route("{productId}")]
-    public IActionResult UpdateProduct(int productId, [FromBody] ProductDto updatedProductDto)
+    public IActionResult UpdateProduct(int productId, [FromBody] Product updatedProduct)
     {
-        ProductDto updatedDto = _productService.UpdateProduct(productId, updatedProductDto);
+        Product updatedDto = _productService.UpdateProduct(productId, updatedProduct);
         return Ok(updatedDto);
     }
     

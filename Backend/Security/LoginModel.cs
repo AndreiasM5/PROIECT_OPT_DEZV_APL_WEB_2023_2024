@@ -3,7 +3,8 @@
 namespace Backend.Security;
 
 public class LoginModel
-{
+{   
+    [EmailAddress]
     [Required(ErrorMessage = "Email is required")]
     public string? Email { get; set; }
 
