@@ -1,13 +1,14 @@
-﻿using System.Collections.ObjectModel;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Backend.Entity;
+using Backend.Security;
 
-namespace Backend.Security;
+namespace Backend.Controllers;
 
 [Route("api")]
 [ApiController]
@@ -82,7 +83,7 @@ public class AuthenticateController : ControllerBase
         return Ok(new Response { Status = "Success", Message = "User created successfully!" });
     }
 
-    // [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     [Route("register-admin")]
     public async Task<IActionResult> RegisterAdmin([FromBody] RegisterModel model)

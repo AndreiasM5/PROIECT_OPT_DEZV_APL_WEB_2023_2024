@@ -1,5 +1,3 @@
-// product.model.ts
-
 export class Product {
     productId: number;
     name: string;

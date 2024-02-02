@@ -30,14 +30,16 @@ public class ProductController : ControllerBase
         return Ok(product);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]  
-    public IActionResult AddCustomer([FromBody] Product Product)
+    public IActionResult AddProduct([FromBody] Product Product)
     {
         Product = _productService.AddProduct(Product);
         
         return CreatedAtAction(nameof(GetProduct), new { Product.ProductId }, Product );
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete]
     [Route("{productId}")]
     public IActionResult DeleteProduct(int productId) {
@@ -45,6 +47,7 @@ public class ProductController : ControllerBase
         return NoContent();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut]
     [Route("{productId}")]
     public IActionResult UpdateProduct(int productId, [FromBody] Product updatedProduct)

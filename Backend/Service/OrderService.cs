@@ -18,7 +18,7 @@ public class OrderService
     public List<OrderDto> GetUserOrders(string userId)
     {
         List<Order> userOrders = _applicationDao.Orders
-                .Include(o => o.Products) // Include related products if needed
+                .Include(o => o.Products)
                 .Where(o => o.UserId == userId)
                 .ToList();
 
@@ -27,40 +27,16 @@ public class OrderService
             return userOrdersDto;
     }
 
-    public OrderDto GetOrder(int orderId)
-    {
-        Order order = _applicationDao.Orders
-            .Include(o => o.Products)
-            .FirstOrDefault(o => o.OrderId == orderId);
-
-        if (order == null)
-        {
-            throw new BadRequestException("Order not found");
-        }
-
-        OrderDto orderDto = new OrderDto
-        {
-            OrderId = order.OrderId,
-            TotalAmount = order.TotalAmount,
-            UserId = order.UserId,
-            ProductsIds = order.Products.Select(p => p.ProductId).ToList()
-        };
-
-        return orderDto;
-    }
-
-    public OrderDto CreateOrder(OrderDto orderDto)
+    public OrderDto CreateOrder(OrderDto orderDto, string userId)
     {
         Order order = new Order
         {
             TotalAmount = orderDto.TotalAmount,
-            UserId = orderDto.UserId
-        };
-
-        // add products to order
-        order.Products = _applicationDao.Products
+            UserId = userId,
+            Products = _applicationDao.Products
             .Where(p => orderDto.ProductsIds.Contains(p.ProductId))
-            .ToList();
+            .ToList()
+        };
 
         _applicationDao.Orders.Add(order);
         _applicationDao.SaveChanges();
@@ -69,12 +45,12 @@ public class OrderService
         return orderDto;
     }
 
-    public void DeleteOrder(int orderId)
+    public void DeleteOrder(int orderId, string userId)
     {
         Order order = _applicationDao.Orders
             .FirstOrDefault(o => o.OrderId == orderId);
 
-        if (order == null)
+        if (order == null || order.UserId != userId)
         {
             throw new BadRequestException("Order not found");
         }
@@ -83,13 +59,13 @@ public class OrderService
         _applicationDao.SaveChanges();
     }
 
-    public OrderDto UpdateOrder(int orderId, OrderDto updatedOrderDto)
+    public OrderDto UpdateOrder(int orderId, OrderDto updatedOrderDto, string userId)
     {
         Order existingOrder = _applicationDao.Orders
             .Include(o => o.Products)
             .FirstOrDefault(o => o.OrderId == orderId);
 
-        if (existingOrder == null)
+        if (existingOrder == null || existingOrder.UserId != userId)
         {
             throw new BadRequestException("Order not found");
         }
@@ -108,13 +84,33 @@ public class OrderService
         return updatedOrderDto;
     }
 
+    public OrderDto GetOrder(int orderId)
+    {
+        Order order = _applicationDao.Orders
+            .Include(o => o.Products)
+            .FirstOrDefault(o => o.OrderId == orderId);
+
+        if (order == null)
+        {
+            throw new BadRequestException("Order not found");
+        }
+
+        OrderDto orderDto = new OrderDto
+        {
+            OrderId = order.OrderId,
+            TotalAmount = order.TotalAmount,
+            ProductsIds = order.Products.Select(p => p.ProductId).ToList()
+        };
+
+        return orderDto;
+    }
+
     private OrderDto MapOrderToOrderDto(Order order)
     {
         OrderDto orderDto = new OrderDto
         {
             OrderId = order.OrderId,
             TotalAmount = order.TotalAmount,
-            UserId = order.UserId,
             ProductsIds = order.Products.Select(product => product.ProductId).ToList()
         };
 

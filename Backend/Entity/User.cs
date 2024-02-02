@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using Backend.Entity;
 using Microsoft.AspNetCore.Identity;
+
+namespace Backend.Entity;
 
 public class User : IdentityUser
 {    

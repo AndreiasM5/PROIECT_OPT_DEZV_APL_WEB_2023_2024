@@ -1,8 +1,17 @@
+<h1>List of Products</h1>
 <div *ngIf="products.length > 0">
-    <h1>List of Products</h1>
     <ul>
       <li *ngFor="let product of products">
         {{ product.name }} - {{ product.price | currency }}
       </li>
     </ul>
-  </div>
+</div>
+
+<h1>List of Orders</h1>
+<div *ngIf="orders.length > 0">
+  <ul>
+    <li *ngFor="let order of orders">
+      {{ order.orderId }} - {{ order.totalAmount | currency }}
+    </li>
+  </ul>
+</div>
