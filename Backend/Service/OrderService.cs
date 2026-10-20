@@ -3,118 +3,30 @@ using Backend.Dto;
 using Backend.Entity;
 using Backend.ExceptionHandling;
 using Microsoft.EntityFrameworkCore;
-
 namespace Backend.Service;
-
-public class OrderService
-{
-    private readonly ApplicationDao _applicationDao;
-
-    public OrderService(ApplicationDao applicationDao)
-    {
-        _applicationDao = applicationDao;
+public class OrderService(ApplicationDao db) {
+    public List<OrderDto> GetUserOrders(string userId) => db.Orders.Include(o => o.Products)
+        .Where(o => o.UserId == userId).OrderByDescending(o => o.OrderId).Select(o => Map(o)).ToList();
+    private List<Product> ResolveProducts(List<int> ids) {
+        if (ids.Count == 0 || ids.Count > 100 || ids.Distinct().Count() != ids.Count)
+            throw new BadRequestException("Choose between 1 and 100 distinct products.");
+        var products = db.Products.Where(p => ids.Contains(p.ProductId)).ToList();
+        if (products.Count != ids.Count) throw new BadRequestException("One or more products do not exist.");
+        return products;
     }
-
-    public List<OrderDto> GetUserOrders(string userId)
-    {
-        List<Order> userOrders = _applicationDao.Orders
-                .Include(o => o.Products)
-                .Where(o => o.UserId == userId)
-                .ToList();
-
-            // Map each Order entity to OrderDto
-            List<OrderDto> userOrdersDto = userOrders.Select(MapOrderToOrderDto).ToList();
-            return userOrdersDto;
+    public OrderDto CreateOrder(OrderDto dto, string userId) {
+        var products = ResolveProducts(dto.ProductsIds);
+        var order = new Order {UserId = userId, Products = products, TotalAmount = products.Sum(p => p.Price)};
+        db.Orders.Add(order); db.SaveChanges(); return Map(order);
     }
-
-    public OrderDto CreateOrder(OrderDto orderDto, string userId)
-    {
-        Order order = new Order
-        {
-            TotalAmount = orderDto.TotalAmount,
-            UserId = userId,
-            Products = _applicationDao.Products
-            .Where(p => orderDto.ProductsIds.Contains(p.ProductId))
-            .ToList()
-        };
-
-        _applicationDao.Orders.Add(order);
-        _applicationDao.SaveChanges();
-
-        orderDto.OrderId = order.OrderId;
-        return orderDto;
+    public OrderDto GetOrder(int id, string userId, bool admin = false) => Map(Find(id, userId, admin));
+    private Order Find(int id, string userId, bool admin = false) => db.Orders.Include(o => o.Products)
+        .FirstOrDefault(o => o.OrderId == id && (admin || o.UserId == userId)) ?? throw new KeyNotFoundException("Order not found.");
+    public void DeleteOrder(int id, string userId) { var order = Find(id, userId); db.Orders.Remove(order); db.SaveChanges(); }
+    public OrderDto UpdateOrder(int id, OrderDto dto, string userId) {
+        var order = Find(id, userId); var products = ResolveProducts(dto.ProductsIds);
+        order.Products.Clear(); order.Products.AddRange(products); order.TotalAmount = products.Sum(p => p.Price);
+        db.SaveChanges(); return Map(order);
     }
-
-    public void DeleteOrder(int orderId, string userId)
-    {
-        Order order = _applicationDao.Orders
-            .FirstOrDefault(o => o.OrderId == orderId);
-
-        if (order == null || order.UserId != userId)
-        {
-            throw new BadRequestException("Order not found");
-        }
-
-        _applicationDao.Orders.Remove(order);
-        _applicationDao.SaveChanges();
-    }
-
-    public OrderDto UpdateOrder(int orderId, OrderDto updatedOrderDto, string userId)
-    {
-        Order existingOrder = _applicationDao.Orders
-            .Include(o => o.Products)
-            .FirstOrDefault(o => o.OrderId == orderId);
-
-        if (existingOrder == null || existingOrder.UserId != userId)
-        {
-            throw new BadRequestException("Order not found");
-        }
-
-        existingOrder.TotalAmount = updatedOrderDto.TotalAmount;
-
-        // update products as well
-        existingOrder.Products.Clear();
-        existingOrder.Products.AddRange(_applicationDao.Products
-            .Where(p => updatedOrderDto.ProductsIds.Contains(p.ProductId))
-            .ToList());
-
-        _applicationDao.SaveChanges();
-
-        updatedOrderDto.OrderId = existingOrder.OrderId;
-        return updatedOrderDto;
-    }
-
-    public OrderDto GetOrder(int orderId)
-    {
-        Order order = _applicationDao.Orders
-            .Include(o => o.Products)
-            .FirstOrDefault(o => o.OrderId == orderId);
-
-        if (order == null)
-        {
-            throw new BadRequestException("Order not found");
-        }
-
-        OrderDto orderDto = new OrderDto
-        {
-            OrderId = order.OrderId,
-            TotalAmount = order.TotalAmount,
-            ProductsIds = order.Products.Select(p => p.ProductId).ToList()
-        };
-
-        return orderDto;
-    }
-
-    private OrderDto MapOrderToOrderDto(Order order)
-    {
-        OrderDto orderDto = new OrderDto
-        {
-            OrderId = order.OrderId,
-            TotalAmount = order.TotalAmount,
-            ProductsIds = order.Products.Select(product => product.ProductId).ToList()
-        };
-
-        return orderDto;
-    }
-
+    private static OrderDto Map(Order o) => new() {OrderId = o.OrderId, TotalAmount = o.TotalAmount, ProductsIds = o.Products.Select(p => p.ProductId).ToList()};
 }

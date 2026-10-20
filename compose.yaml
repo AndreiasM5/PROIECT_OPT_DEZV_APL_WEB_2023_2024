@@ -1,0 +1,16 @@
+name: dotnet-online-store
+services:
+  backend:
+    build: ./Backend
+    ports:
+      - "127.0.0.1:5156:5156"
+    volumes:
+      - store-data:/app/data
+  frontend:
+    build: ./Frontend
+    ports:
+      - "127.0.0.1:4300:80"
+    depends_on:
+      - backend
+volumes:
+  store-data:

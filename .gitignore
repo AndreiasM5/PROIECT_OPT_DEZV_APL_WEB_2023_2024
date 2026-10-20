@@ -3,3 +3,13 @@ bin/
 obj/
 Migrations/
 to_do.txt
+# Local runtime and generated files
+Backend/data/
+Frontend/node_modules/
+Frontend/dist/
+Frontend/.angular/
+.runtime/
+run-logs/
+*.db
+*.db-shm
+*.db-wal
